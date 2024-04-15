@@ -12,6 +12,7 @@ from app.views import app_views, send_alert
 from flasgger import Swagger, swag_from
 
 from exts import db
+from utils.LogHandler import log
 
 
 def create_app():
@@ -30,5 +31,5 @@ def create_app():
     scheduler.add_job(func=send_alert, trigger=CronTrigger(hour=9, minute=0))
     # 启动调度器
     scheduler.start()
-
+    log.info('启动调度器')
     return app

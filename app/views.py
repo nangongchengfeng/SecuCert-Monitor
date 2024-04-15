@@ -12,6 +12,7 @@ from flask_cors import cross_origin
 
 from app.controller import get_day_less_30_re, get_days_tops, get_datas
 from config import dingTalkUrl, dingTalkSecret
+from utils.LogHandler import log
 from utils.ding_send import sendDingMsg, getDingTalkUrl
 from utils.mysql_tools import execute_query
 
@@ -21,13 +22,13 @@ app_views = Blueprint('app_views', __name__)
 @app_views.route('/actuator/health', methods=['GET', 'HEAD'])
 def health():
     """
-    health check
+    监控健康检查
     ---
     tags:
         - 监控
     responses:
         200:
-            description: 健康检查
+            description: sucessful
     description: Health check endpoint
     """
     return jsonify({'online': True})
@@ -36,14 +37,15 @@ def health():
 @app_views.route('/', methods=['GET'])
 def screen_index():
     """
-    大屏显示
+    屏幕展示首页
     ---
     tags:
-        - 监控
+        - 应用App
     responses:
-      200:
-        大屏显示
-    description: 大屏显示
+        200:
+            description: sucessful
+    description: 屏幕展示首页
+    :return:
     """
     data = get_day_less_30_re()
     count = len(data)
@@ -54,7 +56,14 @@ def screen_index():
 @cross_origin()
 def index():
     """
-    数据表格页面
+    首页
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 首页
     :return:
     """
     return render_template('table.html')
@@ -64,6 +73,17 @@ def index():
 @app_views.route('/api/data', methods=['GET'])
 @cross_origin()
 def get_data():
+    """
+    获取数据
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取数据
+    :return:
+    """
     if request.method == 'GET':
         search_key = request.args.get("search_key")
         # 获取 "page" 参数的值，默认为 1
@@ -105,7 +125,14 @@ def get_data():
 @app_views.route('/get_count_type', methods=['GET'])
 def get_count_type():
     """
-    获取证书类型的数量
+    获取证书类型数量
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取证书类型数量
     :return:
     """
     sql = f"""
@@ -124,8 +151,14 @@ def get_count_type():
 @app_views.route('/get_count_day', methods=['GET'])
 def get_count_day():
     """
-
-    获取证书有效期的数量
+    获取证书有效期数量
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取证书有效期数量
     :return:
     """
     sql = """SELECT validity from cert"""
@@ -174,8 +207,14 @@ def get_count_day():
 @app_views.route('/get_count_day_validity', methods=['GET'])
 def get_count_day_validity():
     """
-    获取证书有效期的数量
-    :return:
+    获取证书有效期数量
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取证书有效期数量
     """
     sql = """SELECT DATEDIFF(expiration_date, NOW()) AS day_validity   FROM Certificate.expiration_monitor WHERE expiration_date != "NULL"   """
     data_day = []
@@ -225,6 +264,13 @@ def get_count_day_validity():
 def get_days_top():
     """
     根据证书有效期进行排序，获取前10条数据
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 根据证书有效期进行排序，获取前10条数据
     :return:
     """
 
@@ -246,10 +292,32 @@ def get_days_top():
 
 @app_views.route('/alerts', methods=['GET'])
 def alerts():
+    """
+    获取MySQL数据表中的证书有效期，如果证书有效期小于30天，就发送钉钉给相关人员
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取MySQL数据表中的证书有效期，如果证书有效期小于30天，就发送钉钉给相关人员
+    :return:
+    """
     return render_template('alert_table.html')
 
 @app_views.route('/get_day_less_30', methods=['GET'])
 def get_day_less_30():
+    """
+    获取证书有效期小于30天的数据
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 获取证书有效期小于30天的数据
+    :return:
+    """
     data = get_day_less_30_re()
     count = len(data)
     res = {
@@ -264,6 +332,13 @@ def get_day_less_30():
 def send_alert():
     """
     检查证书即将过期 小于30天,发送钉钉告警
+    ---
+    tags:
+        - 应用App
+    responses:
+        200:
+            description: sucessful
+    description: 检查证书即将过期 小于30天,发送钉钉告警
     :return:
     """
     print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -308,4 +383,6 @@ def send_alert():
         # sendDingMsg(dingTalkUrl, service_list)
         # print('服务名称：', service_name, '过期时间：', expiration_date, '还有多久过期：', day_validity, '负责人：', header,
         #       '巡检人：', yumwei, '相关领导：', manager)
+        log.info('服务名称：' + service_name + '过期时间：' + expiration_date + '还有多久过期：' + day_validity + '负责人：' + header +
+                   '巡检人：' + yumwei + '相关领导：' + manager)
         return 'success'
