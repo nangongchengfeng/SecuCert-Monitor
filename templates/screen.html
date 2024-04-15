@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block nav_this_1_0 %}
+layui-this
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="layui-col-md4">
+            <div class="layui-card">
+
+                <div class="layui-card-body"
+                     style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 300px;">
+                    <div class="txt" style="width: 100%; height: 150px; text-align: center;">
+                        <h2 style="font-size: 36px;">告警数量</h2>
+                    </div>
+
+                    <div class="num" style="width: 100%; height: 150px; text-align: center;">
+                        <h1 style="font-size: 90px;color: red;">{{ count }}</h1>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="layui-col-md4">
+            <div class="layui-card">
+
+                <div class="layui-card-body">
+                    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+                    <div id="main" style="width:100%;height:350px;"></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="layui-col-md4">
+            <div class="layui-card">
+
+                <div class="layui-card-body">
+                    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+                    <div id="day_validity" style="width:100%;height:350px;"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">证书日期TOP10统计</div>
+                <div class="layui-card-body">
+                    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+                    <!--                    <div id="count_month" style="width:100%;height:400px;background-color: #00d1b2"></div>-->
+                    <table class="layui-hide" id="test"></table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="../static/js/echarts.min.js"></script>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<!--suppress BadExpressionStatementJS -->
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    // 指定图表的配置项和数据
+    var count_type_option = {
+        title: {
+            text: '证书类型统计',
+            subtext: '类型统计',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: '50%',
+                data: [],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(count_type_option);
+
+    function get_count_type() {
+        $.ajax({
+            url: '/get_count_type',
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                count_type_option.series[0].data = data;
+                myChart.setOption(count_type_option);
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+    }
+
+    get_count_type()
+    setInterval(get_count_type, 10000);
+    //
+    // var Count_Day = echarts.init(document.getElementById('count_day'));
+    // // noinspection BadExpressionStatementJS
+    // var count_day_option = {
+    //     title: {
+    //         text: '证书有效期统计',
+    //         subtext: '证书',
+    //         left: 'center'
+    //     },
+    //     xAxis: {
+    //         type: 'category',
+    //         data: ['30天内', '一年内', '二年内', '三年内', '五年内', '十年内', '十年以上'],
+    //         name: '时间',
+    //         axisLabel: {
+    //             interval: 0,
+    //             rotate: 30
+    //         }
+    //     },
+    //     yAxis: {
+    //         type: 'value',
+    //         name: '数量'
+    //     },
+    //     series: [
+    //         {
+    //             data: [],
+    //             label: {
+    //                 normal: {
+    //                     show: true, // 是否显示标签
+    //                     position: 'top', // 标签的位置
+    //                     formatter: '{c}' // 标签的格式
+    //                 }
+    //             },
+    //             type: 'bar',
+    //             showBackground: true,
+    //             backgroundStyle: {
+    //                 color: 'rgba(180, 180, 180, 0.2)'
+    //             }
+    //         }
+    //     ]
+    // };
+    // Count_Day.setOption(count_day_option);
+    //
+    // function get_count_day() {
+    //     $.ajax({
+    //         url: '/get_count_day',
+    //         type: 'get',
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             count_day_option.series[0].data = data;
+    //
+    //             Count_Day.setOption(count_day_option);
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.log(error);
+    //         }
+    //     });
+    //
+    // }
+    //
+    // get_count_day()
+    // setInterval(get_count_day, 10000);
+
+
+    var Count_Day_Validity = echarts.init(document.getElementById('day_validity'));
+
+    var count_day_validity_option = {
+        title: {
+            text: '证书即将到期统计',
+            subtext: '证书将到期',
+            left: 'center'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['30天内', '一年内', '二年内', '三年内', '五年内', '十年内', '十年以上'],
+            name: '时间',
+            axisLabel: {
+                interval: 0,
+                rotate: 30
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: '数量'
+        },
+        series: [
+            {
+                data: [],
+                label: {
+                    normal: {
+                        show: true, // 是否显示标签
+                        position: 'top', // 标签的位置
+                        formatter: '{c}' // 标签的格式
+                    }
+                },
+                type: 'bar',
+                showBackground: true,
+                backgroundStyle: {
+                    color: 'rgba(180, 180, 180, 0.2)'
+                }
+            }
+        ]
+    };
+    Count_Day_Validity.setOption(count_day_validity_option);
+
+    function get_count_day_validity() {
+        $.ajax({
+            url: '/get_count_day_validity',
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                count_day_validity_option.series[0].data = data;
+
+                Count_Day_Validity.setOption(count_day_validity_option);
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+    }
+
+    get_count_day_validity()
+    setInterval(get_count_day_validity, 10000);
+
+
+    layui.use(['table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+
+        table.render({
+            elem: '#test'
+            , size: 'lg'// 大尺寸
+            , url: '/get_days_top'
+            , method: 'get'
+            , cols: [[
+                {field: 'service_name', title: '名称', width: '15%'}
+                , {field: 'type', title: '类型', sort: true, width: '6%'}
+                , {field: 'organ', title: '第三方组织', width: '7%'}
+                , {field: 'use_deploy', title: '使用部门', width: '10%'}
+                , {field: 'day_validity', title: '即将到期(天)', width: '7%'}
+                , {field: 'expiration_date', title: '到期时间', sort: true, width: '7%'}
+                , {field: 'header', title: '合同经办人', sort: true, width: '8%'}
+                , {field: 'manager', title: '关联主管', width: '13%'}
+                , {field: 'yumwei', title: '巡检人员'}
+                , {field: 'scene', title: '使用场景'}
+
+
+            ]],
+            done: function () {
+                $(".layui-table-box").css("border-width", "0px");
+                $(".layui-table-header tr").css("height", "40");
+                $(".layui-table-header tr").css("background-color", "white");
+                $(".layui-table-header tr span").css("color", "#666666");
+                $(".layui-table-body tr").css("height", "40px");
+            },
+
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+<!--{% block nav_item_1 %}-->
+<!--layui-nav-itemed-->
+<!--{% endblock %}-->
+{% block nav_this_1_10 %}
+layui-this
+{% endblock %}
+
+
+{% block css %}
+<style>
+
+</style>
+{% endblock %}
+{% block content %}
+<!--<div class="demoTable">-->
+<!--    搜索(名称|类型|组织):-->
+<!--    <div class="layui-inline">-->
+<!--        <input class="layui-input" name="name" id="demoReload" autocomplete="off">-->
+<!--    </div>-->
+<!--    <button class="layui-btn" data-type="reload" id="searchBtn">搜索</button>-->
+<!--</div>-->
+<div class="demoTable">
+    <b>请及时处理即将到期的证书!</b>
+</div>
+<hr>
+<table class="layui-hide" id="test"></table>
+{% endblock %}
+
+{% block js %}
+<script>
+    layui.use(['table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+
+        table.render({
+            elem: '#test'
+            , size: 'lg'// 大尺寸
+            , url: '/get_day_less_30'
+            , method: 'get'
+            , cols: [[
+                {field: 'service_name', title: '名称', width: '15%'}
+                , {field: 'type', title: '类型', sort: true, width: '6%'}
+                , {field: 'organ', title: '第三方组织', width: '7%'}
+                , {field: 'use_deploy', title: '使用部门', width: '10%'}
+                , {field: 'day_validity', title: '即将到期(天)', width: '7%'}
+                , {field: 'expiration_date', title: '到期时间', sort: true, width: '7%'}
+                , {field: 'header', title: '合同经办人', sort: true, width: '8%'}
+                , {field: 'manager', title: '关联主管', width: '13%'}
+                , {field: 'yumwei', title: '巡检人员'}
+                , {field: 'scene', title: '使用场景'}
+            ]]
+            , page: true
+            , id: 'nstb'
+            // , limit: 15
+            , done: function () {
+                $(".layui-table-box").css("border-width", "0px");
+                $(".layui-table-header tr").css("height", "50px");
+                $(".layui-table-header tr").css("background-color", "white");
+                $(".layui-table-header tr span").css("color", "#666666");
+                $(".layui-table-body tr").css("height", "50px");
+            },
+
+        });
+        // $("#searchBtn").click(function () {
+        //     var search_key = $("input[name='name']").val();
+        //     console.log(search_key)
+        //     // 数据表格重载
+        //     table.reload('nstb', {
+        //         where: { //设定异步数据接口的额外参数，任意设
+        //             search_key: search_key
+        //         }
+        //         , page: {
+        //             curr: 1 //重新从第 1 页开始
+        //         }
+        //     }); //只重载数据
+        // });
+    });
+
+</script>
+
+{% endblock %}

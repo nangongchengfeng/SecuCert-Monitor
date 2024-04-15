@@ -1,0 +1,17 @@
+
+#cpu {
+    position: absolute;
+    width: 30%;
+    height: 40%;
+    top: 10%;
+    left: 0%;
+    background: #48dada;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold; /* 加粗字体 */
+    border-radius: 10px; /* 增加圆润感 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* 增加一些阴影，增加科技感 */
+}

@@ -5,4 +5,10 @@
 # @File    : config.py.py
 # @Software: PyCharm
 class Config:
-    SECRET_KEY = 'your_secret_key_here'
+    SECRET_KEY = '111111111111111'
+
+
+# 相关参数
+dingTalkUrl = "https://oapi.dingtalk.com/robot/send?access_token=xxxxx"
+# 机器人的加签密钥
+dingTalkSecret = "xxxxxxxxxxxxxxxxxxxxxxx"
