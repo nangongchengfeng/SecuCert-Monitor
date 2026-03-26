@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+backend/.venv/
+backend/venv/
+.env
+.venv
+env/
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Build
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+logs/
+__pycache__/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Lock files
+uv.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Pipfile.lock
+
+# OS
+.DS_Store
+Thumbs.db
