@@ -239,6 +239,11 @@ const form = ref<CertificateForm>({
   remark: ''
 })
 
+const formatDateForInput = (dateStr?: string) => {
+  if (!dateStr) return ''
+  return dateStr.split('T')[0]
+}
+
 const isNew = computed(() => !route.params.id || route.params.id === 'new')
 
 const goBack = () => {
@@ -250,8 +255,11 @@ const loadCertificate = async (id: number) => {
     loading.value = true
     const res = await certificateApi.getCertificate(id)
     certificate.value = res.data
-    form.value = { ...res.data }
-    originalForm.value = { ...res.data }
+    const data = { ...res.data }
+    data.issuance_date = formatDateForInput(data.issuance_date)
+    data.expiration_date = formatDateForInput(data.expiration_date)
+    form.value = data
+    originalForm.value = { ...data }
   } catch (error) {
     toast.add({ severity: 'error', summary: '错误', detail: '加载证书详情失败' })
   } finally {

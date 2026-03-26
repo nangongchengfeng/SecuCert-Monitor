@@ -8,6 +8,15 @@ from app.api.schemas import APIResponse, CertificateCreate, CertificateUpdate
 certificates_bp = Blueprint('certificates', __name__, url_prefix='/api')
 
 
+def parse_date(date_str):
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        return None
+
+
 def get_day_validity(cert):
     if not cert.expiration_date:
         return None
@@ -80,8 +89,14 @@ def get_certificate(cert_id):
 def create_certificate():
     data = request.get_json()
     cert_data = CertificateCreate(**data)
+    cert_dict = cert_data.model_dump()
 
-    cert = ExpirationMonitor(**cert_data.model_dump())
+    if 'issuance_date' in cert_dict:
+        cert_dict['issuance_date'] = parse_date(cert_dict.get('issuance_date'))
+    if 'expiration_date' in cert_dict:
+        cert_dict['expiration_date'] = parse_date(cert_dict.get('expiration_date'))
+
+    cert = ExpirationMonitor(**cert_dict)
     db.session.add(cert)
     db.session.commit()
 
@@ -95,6 +110,8 @@ def update_certificate(cert_id):
     cert_data = CertificateUpdate(**data)
 
     for key, value in cert_data.model_dump(exclude_unset=True).items():
+        if key in ['issuance_date', 'expiration_date']:
+            value = parse_date(value)
         setattr(cert, key, value)
 
     db.session.commit()

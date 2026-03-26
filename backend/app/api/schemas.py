@@ -19,8 +19,8 @@ class CertificateCreate(BaseModel):
     organ: Optional[str] = None
     manage: Optional[str] = None
     manage_id: Optional[str] = None
-    issuance_date: Optional[datetime] = None
-    expiration_date: Optional[datetime] = None
+    issuance_date: Optional[str] = None
+    expiration_date: Optional[str] = None
     header: Optional[str] = None
     tech: Optional[str] = None
     yumwei: Optional[str] = None
