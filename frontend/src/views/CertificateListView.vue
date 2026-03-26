@@ -2,7 +2,9 @@
   <div class="certificate-list">
     <div class="page-header">
       <h2 class="page-title">证书列表</h2>
-      <Button label="新增证书" icon="pi pi-plus" class="mac-button" @click="goToCreate" />
+      <button class="mac-button" @click="goToCreate">
+        <i class="pi pi-plus"></i> 新增证书
+      </button>
     </div>
 
     <div class="filter-bar">
@@ -15,14 +17,31 @@
           @input="onSearch"
         />
       </div>
-      <Dropdown
-        v-model="statusFilter"
-        :options="statusOptions"
-        placeholder="筛选状态"
-        class="status-select"
-        @change="loadCertificates"
-        :showClear="true"
-      />
+      <div class="mac-select" @click="toggleSelect">
+        <div class="mac-select-value">
+          <span v-if="statusFilter">{{ getStatusLabel(statusFilter) }}</span>
+          <span v-else class="placeholder">筛选状态</span>
+        </div>
+        <i class="pi pi-chevron-down select-icon" :class="{ open: showSelect }"></i>
+        <div class="mac-select-dropdown" v-if="showSelect">
+          <div
+            class="mac-select-option"
+            :class="{ selected: !statusFilter }"
+            @click="selectStatus(null)"
+          >
+            全部
+          </div>
+          <div
+            v-for="option in statusOptions"
+            :key="option.value"
+            class="mac-select-option"
+            :class="{ selected: statusFilter === option.value }"
+            @click="selectStatus(option.value)"
+          >
+            {{ option.label }}
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="table-card">
@@ -128,10 +147,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Button from 'primevue/button'
-import Dropdown from 'primevue/dropdown'
 import { useToast } from 'primevue/usetoast'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useCertificateStore } from '@/stores/certificate'
@@ -150,6 +167,7 @@ const perPage = ref(20)
 const searchQuery = ref('')
 const statusFilter = ref<string | null>(null)
 const searchTimeout = ref<number | null>(null)
+const showSelect = ref(false)
 
 const showDeleteDialog = ref(false)
 const deletingCertificate = ref<Certificate | null>(null)
@@ -165,7 +183,29 @@ const totalPages = computed(() => Math.ceil(total.value / perPage.value))
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return '-'
-  return dateStr.split('T')[0]
+  return dateStr
+}
+
+const getStatusLabel = (value: string) => {
+  const option = statusOptions.find(o => o.value === value)
+  return option ? option.label : ''
+}
+
+const toggleSelect = () => {
+  showSelect.value = !showSelect.value
+}
+
+const selectStatus = (value: string | null) => {
+  statusFilter.value = value
+  showSelect.value = false
+  loadCertificates(1)
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.mac-select')) {
+    showSelect.value = false
+  }
 }
 
 const loadCertificates = async (page = 1) => {
@@ -237,6 +277,11 @@ const doDelete = async () => {
 
 onMounted(() => {
   loadCertificates()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -327,14 +372,87 @@ onMounted(() => {
   }
 }
 
-.status-select {
-  width: 180px;
+.mac-select {
+  position: relative;
+  min-width: 180px;
 
-  :deep(.p-dropdown) {
-    background: rgba(255, 255, 255, 0.9);
+  .mac-select-value {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
     border: 1px solid var(--mac-border);
     border-radius: 12px;
-    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    color: var(--mac-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+
+    &:hover {
+      border-color: var(--mac-blue);
+    }
+
+    .placeholder {
+      color: var(--mac-gray);
+    }
+  }
+
+  .select-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mac-gray);
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+
+    &.open {
+      transform: translateY(-50%) rotate(180deg);
+    }
+  }
+
+  .mac-select-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--mac-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    overflow: hidden;
+    animation: dropdownIn 0.15s ease;
+  }
+
+  .mac-select-option {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    color: var(--mac-text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: rgba(0, 122, 255, 0.08);
+    }
+
+    &.selected {
+      background: rgba(0, 122, 255, 0.12);
+      color: var(--mac-blue);
+      font-weight: 600;
+    }
+  }
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
