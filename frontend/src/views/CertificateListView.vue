@@ -16,13 +16,13 @@
           <i class="pi pi-search"></i>
         </template>
       </InputText>
-      <Select
+      <Dropdown
         v-model="statusFilter"
         :options="statusOptions"
         placeholder="筛选状态"
         class="status-select"
         @change="loadCertificates"
-        clearable
+        :showClear="true"
       />
     </div>
 
@@ -100,11 +100,12 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
-import Select from 'primevue/select'
+import Dropdown from 'primevue/dropdown'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
 import Toast from 'primevue/toast'
+import ToastService from 'primevue/toastservice'
 import { useToast } from 'primevue/usetoast'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useCertificateStore } from '@/stores/certificate'

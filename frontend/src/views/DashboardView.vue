@@ -36,79 +36,40 @@
     <div class="charts-grid">
       <div class="chart-card">
         <h3>按类型分布</h3>
-        <v-chart :option="pieOption" class="chart" autoresize />
+        <div class="type-list">
+          <div v-for="item in typeStats" :key="item.type" class="type-item">
+            <span class="type-name">{{ item.type }}</span>
+            <span class="type-count">{{ item.count }}</span>
+          </div>
+        </div>
       </div>
       <div class="chart-card">
         <h3>即将过期 Top 10</h3>
-        <DataTable :value="expiring" stripedRows size="small" class="expiring-table">
-          <Column field="service_name" header="证书名称" />
-          <Column field="type" header="类型" />
-          <Column field="expiration_date" header="过期日期">
-            <template #body="slotProps">
-              {{ formatDate(slotProps.data.expiration_date) }}
-            </template>
-          </Column>
-          <Column field="day_validity" header="剩余天数">
-            <template #body="slotProps">
-              <span class="days-badge urgent">{{ slotProps.data.day_validity }} 天</span>
-            </template>
-          </Column>
-        </DataTable>
+        <div class="expiring-list">
+          <div v-for="item in expiring" :key="item.id" class="expiring-item">
+            <div class="expiring-info">
+              <div class="expiring-name">{{ item.service_name }}</div>
+              <div class="expiring-meta">{{ item.type }} · {{ formatDate(item.expiration_date) }}</div>
+            </div>
+            <span class="days-badge urgent">{{ item.day_validity }} 天</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { use } from 'echarts/core'
-import { PieChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-import VChart from 'vue-echarts'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
+import { ref, onMounted } from 'vue'
 import { useCertificateStore } from '@/stores/certificate'
 import { statsApi } from '@/api/stats'
 import type { OverviewStats, TypeStats, Certificate } from '@/types/certificate'
 
-use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer])
-
-const router = useRouter()
 const store = useCertificateStore()
 
 const overview = ref<OverviewStats | null>(null)
 const typeStats = ref<TypeStats[]>([])
 const expiring = ref<Certificate[]>([])
-
-const pieOption = computed(() => ({
-  tooltip: {
-    trigger: 'item'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left'
-  },
-  series: [
-    {
-      name: '证书类型',
-      type: 'pie',
-      radius: '60%',
-      data: typeStats.value.map(item => ({
-        value: item.count,
-        name: item.type
-      })),
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
-    }
-  ]
-}))
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return '-'
@@ -243,18 +204,60 @@ onMounted(() => {
   }
 }
 
-.chart {
-  height: 300px;
+.type-list {
+  .type-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .type-name {
+    color: #374151;
+  }
+
+  .type-count {
+    font-weight: 600;
+    color: #1e3a5f;
+  }
 }
 
-.expiring-table {
-  font-size: 0.875rem;
+.expiring-list {
+  .expiring-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .expiring-info {
+    .expiring-name {
+      font-weight: 500;
+      color: #1e3a5f;
+    }
+
+    .expiring-meta {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+  }
 }
 
 .days-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-weight: 600;
+  font-size: 0.875rem;
 
   &.urgent {
     background: #fef2f2;
