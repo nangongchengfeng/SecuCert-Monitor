@@ -5,11 +5,25 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(180deg, #f0f5ff 0%, #e8f0ff 100%);
+  min-height: 100vh;
 }
 
 #app {
   min-height: 100vh;
+}
+
+:root {
+  --mac-blue: #007aff;
+  --mac-blue-light: #64b5f6;
+  --mac-bg: #f5f8ff;
+  --mac-white: #ffffff;
+  --mac-gray: #8e8e93;
+  --mac-text: #1c1c1e;
+  --mac-border: rgba(0, 122, 255, 0.1);
+  --mac-shadow: 0 4px 20px rgba(0, 122, 255, 0.08);
+  --mac-shadow-hover: 0 8px 30px rgba(0, 122, 255, 0.12);
 }

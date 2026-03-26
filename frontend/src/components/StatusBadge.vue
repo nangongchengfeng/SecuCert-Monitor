@@ -1,6 +1,6 @@
 <template>
   <span :class="badgeClass">
-    <i :class="iconClass" v-if="showIcon"></i>
+    <i :class="iconClass" v-if="large"></i>
     {{ badgeText }}
   </span>
 </template>
@@ -16,8 +16,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   large: false
 })
-
-const showIcon = computed(() => props.large)
 
 const badgeClass = computed(() => {
   const base = props.large ? 'status-badge-large' : 'status-badge'
@@ -67,35 +65,35 @@ const badgeText = computed(() => {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
   font-weight: 600;
 
   &.status-normal {
-    background: #dcfce7;
-    color: #166534;
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
   }
 
   &.status-warning {
-    background: #fef3c7;
-    color: #92400e;
+    background: rgba(255, 149, 0, 0.12);
+    color: #ff9500;
   }
 
   &.status-urgent {
-    background: #fee2e2;
-    color: #991b1b;
+    background: rgba(255, 45, 85, 0.12);
+    color: #ff2d55;
   }
 
   &.status-expired {
-    background: #f3f4f6;
-    color: #4b5563;
+    background: rgba(142, 142, 147, 0.12);
+    color: #8e8e93;
   }
 
   &.status-unknown {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: rgba(142, 142, 147, 0.1);
+    color: #8e8e93;
   }
 }
 
@@ -104,37 +102,37 @@ const badgeText = computed(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 600;
 
   i {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   &.status-normal {
-    background: #dcfce7;
-    color: #166534;
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
   }
 
   &.status-warning {
-    background: #fef3c7;
-    color: #92400e;
+    background: rgba(255, 149, 0, 0.12);
+    color: #ff9500;
   }
 
   &.status-urgent {
-    background: #fee2e2;
-    color: #991b1b;
+    background: rgba(255, 45, 85, 0.12);
+    color: #ff2d55;
   }
 
   &.status-expired {
-    background: #f3f4f6;
-    color: #4b5563;
+    background: rgba(142, 142, 147, 0.12);
+    color: #8e8e93;
   }
 
   &.status-unknown {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: rgba(142, 142, 147, 0.1);
+    color: #8e8e93;
   }
 }
 </style>

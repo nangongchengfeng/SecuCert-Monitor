@@ -5,7 +5,7 @@ import ToastService from 'primevue/toastservice'
 import router from './router'
 import App from './App.vue'
 
-import 'primevue/resources/themes/aura-light-blue/theme.css'
+import 'primevue/resources/themes/saga-blue/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 import './assets/styles/main.scss'

@@ -15,6 +15,11 @@ const routes = [
     component: CertificateListView
   },
   {
+    path: '/certificates/new',
+    name: 'CertificateCreate',
+    component: CertificateDetailView
+  },
+  {
     path: '/certificates/:id',
     name: 'CertificateDetail',
     component: CertificateDetailView
