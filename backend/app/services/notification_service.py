@@ -23,7 +23,7 @@ def get_dingtalk_url(webhook_url, secret):
     hmac_code = hmac.new(secret_enc, string_to_sign_enc,
                          digestmod=hashlib.sha256).digest()
     sign = urllib.parse.quote_plus(base64.b64encode(hmac_code))
-    return f"{webhook_url}&timestamp={timestamp}&sign={sign}"
+    return webhook_url + "&timestamp=" + timestamp + "&sign=" + sign
 
 
 def is_notified_today(cert_id):
@@ -52,11 +52,16 @@ def build_notification_message(certificates):
     """构建钉钉通知消息（Markdown格式）"""
     title = "证书过期提醒"
     keywords = os.getenv('DINGTALK_KEYWORDS', '证书,过期,告警').split(',')
-    keyword_text = ' '.join([f'[{k.strip()}]' for k in keywords if k.strip())
+    keyword_list = []
+    for k in keywords:
+        k_stripped = k.strip()
+        if k_stripped:
+            keyword_list.append('[' + k_stripped + ']')
+    keyword_text = ' '.join(keyword_list)
 
-    text = f'''{keyword_text}
+    text = keyword_text + '''
 
-<font color='#FF0000'><b>[证书巡检]</b></font> <b>{title}</b>
+<font color='#FF0000'><b>[证书巡检]</b></font> <b>''' + title + '''</b>
 
 ---
 
@@ -70,32 +75,32 @@ def build_notification_message(certificates):
         else:
             days_remaining = '未知'
 
-        text += f'''<font color='#778899' size=2><b>证书名称：</b> {cert.service_name or '-'}</font>
+        text += '''<font color='#778899' size=2><b>证书名称：</b> ''' + (cert.service_name or '-') + '''</font>
 
 '''
-        text += f'''<font color='#708090' size=2><b>过期日期：</b> {cert.expiration_date.strftime('%Y-%m-%d') if cert.expiration_date else '-'}</font>
+        text += '''<font color='#708090' size=2><b>过期日期：</b> ''' + (cert.expiration_date.strftime('%Y-%m-%d') if cert.expiration_date else '-') + '''</font>
 
 '''
-        text += f'''<font color='#708090' size=2><b>剩余天数：</b> {days_remaining} 天</font>
+        text += '''<font color='#708090' size=2><b>剩余天数：</b> ''' + str(days_remaining) + ''' 天</font>
 
 '''
-        text += f'''<font color='#708090' size=2><b>类型：</b> {cert.type or '-'}</font>
+        text += '''<font color='#708090' size=2><b>类型：</b> ''' + (cert.type or '-') + '''</font>
 
 '''
-        text += f'''<font color='#708090' size=2><b>负责人：</b> {cert.header or '-'}</font>
+        text += '''<font color='#708090' size=2><b>负责人：</b> ''' + (cert.header or '-') + '''</font>
 
 '''
-        text += f'''<font color='#708090' size=2><b>使用部门：</b> {cert.use_deploy or '-'}</font>
+        text += '''<font color='#708090' size=2><b>使用部门：</b> ''' + (cert.use_deploy or '-') + '''</font>
 
 ---
 
 '''
 
-    text += f'''<font color='#708090' size=2><b>备注：</b> 请及时处理并更新证书信息</font>
+    text += '''<font color='#708090' size=2><b>备注：</b> 请及时处理并更新证书信息</font>
 
 ---
 
-{keyword_text}
+''' + keyword_text + '''
 
 '''
 
@@ -153,14 +158,12 @@ def check_and_notify():
         print("未配置钉钉 Webhook，跳过通知")
         return
 
-    # 获取即将过期的证书
     certificates = get_expiring_certificates(days=notify_days)
 
     if not certificates:
         print("没有即将过期的证书")
         return
 
-    # 过滤今天已经通知过的
     to_notify = []
     for cert in certificates:
         if not is_notified_today(cert.id):
@@ -170,12 +173,10 @@ def check_and_notify():
         print("今天已经全部通知过了")
         return
 
-    print(f"准备通知 {len(to_notify)} 个证书")
+    print("准备通知 " + str(len(to_notify)) + " 个证书")
 
-    # 发送通知
     success, error_msg = send_dingtalk_message(webhook_url, secret, to_notify)
 
-    # 记录日志
     for cert in to_notify:
         if cert.expiration_date:
             today = datetime.now().date()
@@ -189,4 +190,4 @@ def check_and_notify():
     if success:
         print("钉钉通知发送成功")
     else:
-        print(f"钉钉通知发送失败: {error_msg}")
+        print("钉钉通知发送失败: " + (error_msg or ''))
