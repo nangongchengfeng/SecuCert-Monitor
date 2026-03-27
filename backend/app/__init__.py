@@ -2,6 +2,8 @@ from flask import Flask
 from app.config import Config
 from app.extensions import db, cors
 from app.api import certificates_bp, stats_bp, health_bp
+from app.tasks.scheduler import init_scheduler, shutdown_scheduler
+import atexit
 
 
 def create_app(config_class=Config):
@@ -14,6 +16,12 @@ def create_app(config_class=Config):
     app.register_blueprint(certificates_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(health_bp)
+
+    # 初始化定时任务
+    init_scheduler(app)
+
+    # 应用退出时关闭调度器
+    atexit.register(shutdown_scheduler)
 
     @app.errorhandler(404)
     def not_found(error):
