@@ -56,12 +56,10 @@ def build_notification_message(certificates):
     for k in keywords:
         k_stripped = k.strip()
         if k_stripped:
-            keyword_list.append('[' + k_stripped + ']')
+            keyword_list.append(k_stripped)
     keyword_text = ' '.join(keyword_list)
 
-    text = keyword_text + '''
-
-<font color='#FF0000'><b>[证书巡检]</b></font> <b>''' + title + '''</b>
+    text = '''<font color='#FF0000'><b>[证书巡检]</b></font> <b>''' + title + ''' ''' + keyword_text + '''</b>
 
 ---
 
@@ -97,10 +95,6 @@ def build_notification_message(certificates):
 '''
 
     text += '''<font color='#708090' size=2><b>备注：</b> 请及时处理并更新证书信息</font>
-
----
-
-''' + keyword_text + '''
 
 '''
 

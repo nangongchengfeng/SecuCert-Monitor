@@ -24,7 +24,7 @@ if not webhook_url:
 test_data = {
     "msgtype": "text",
     "text": {
-        "content": "证书 过期 告警 - 这是一条测试消息"
+        "content": "证书巡检 - 这是一条测试消息"
     }
 }
 
