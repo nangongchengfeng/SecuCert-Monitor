@@ -123,8 +123,13 @@ def send_dingtalk_message(webhook_url, secret, certificates):
         data = build_notification_message(certificates)
         headers = {"Content-Type": "application/json"}
 
+        print(f"发送钉钉消息到: {url[:80]}...")
+        print(f"消息内容: {json.dumps(data, ensure_ascii=False)[:200]}...")
+
         res = requests.post(url, data=json.dumps(data), headers=headers, timeout=10)
         result = res.json()
+
+        print(f"钉钉响应: {json.dumps(result, ensure_ascii=False)}")
 
         if result.get('errcode') == 0:
             return True, None
@@ -132,6 +137,9 @@ def send_dingtalk_message(webhook_url, secret, certificates):
             return False, result.get('errmsg', '未知错误')
 
     except Exception as e:
+        print(f"发送异常: {e}")
+        import traceback
+        traceback.print_exc()
         return False, str(e)
 
 
