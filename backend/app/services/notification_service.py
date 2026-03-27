@@ -51,7 +51,12 @@ def get_expiring_certificates(days=30):
 def build_notification_message(certificates):
     """构建钉钉通知消息（Markdown格式）"""
     title = "证书过期提醒"
-    text = f'''<font color='#FF0000'><b>[证书巡检]</b></font> <b>{title}</b>
+    keywords = os.getenv('DINGTALK_KEYWORDS', '证书,过期,告警').split(',')
+    keyword_text = ' '.join([f'[{k.strip()}]' for k in keywords if k.strip())
+
+    text = f'''{keyword_text}
+
+<font color='#FF0000'><b>[证书巡检]</b></font> <b>{title}</b>
 
 ---
 
@@ -87,6 +92,10 @@ def build_notification_message(certificates):
 '''
 
     text += f'''<font color='#708090' size=2><b>备注：</b> 请及时处理并更新证书信息</font>
+
+---
+
+{keyword_text}
 
 '''
 
