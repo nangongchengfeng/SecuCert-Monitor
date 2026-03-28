@@ -6,6 +6,8 @@
 
 ![QQ20260326-222008](images/QQ20260326-222008.png)
 
+![QQ20260327-230136](images/QQ20260327-230136.png)
+
 ## 项目结构
 
 ```
@@ -36,14 +38,17 @@ SecuCert-Monitor/
 - Flask 2.2+
 - Flask-SQLAlchemy
 - SQLite / MySQL（双数据库支持）
+- APScheduler（定时任务）
 - uv (推荐) 或 pip
 - Faker（假数据生成）
+- 钉钉机器人 Webhook（通知）
 
 ### 前端
 - Vue 3 (Composition API)
 - Vite 5
 - TypeScript
 - ECharts 5
+- PrimeVue 3 (UI 组件库)
 - Pinia
 - Vue Router
 - Axios
@@ -58,10 +63,14 @@ SecuCert-Monitor/
 ```bash
 cd backend
 
+# 复制环境变量配置
+cp .env.example .env
+# 编辑 .env 配置数据库和钉钉机器人
+
 # 使用 uv (推荐)
 uv venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
+uv sync
 
 # 或使用 pip
 python -m venv venv
@@ -110,6 +119,16 @@ SECRET_KEY=your-secret-key-here
 DATABASE_URL=sqlite:///./certificates.db
 # 或 MySQL
 # DATABASE_URL=mysql+pymysql://user:password@localhost:3306/certificate
+
+# 钉钉机器人配置（可选）
+# DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=your_token_here
+# DINGTALK_SECRET=your_secret_here  # 加签密钥（可选）
+# DINGTALK_KEYWORDS=证书,过期,告警     # 关键词（需在钉钉机器人安全设置中添加）
+
+# 定时任务配置（可选）
+# SCHEDULE_HOUR=9          # 每日巡检时间（小时）
+# SCHEDULE_MINUTE=0        # 每日巡检时间（分钟）
+# NOTIFY_DAYS_BEFORE=30    # 提前多少天开始通知
 ```
 
 ### 前端配置
@@ -151,6 +170,10 @@ DATABASE_URL=sqlite:///./certificates.db
 - ✅ 可视化统计图表（ECharts）
 - ✅ macOS 风格 UI
 - ✅ 假数据生成脚本
+- ✅ 定时巡检证书过期时间（APScheduler）
+- ✅ 钉钉机器人通知（支持关键词和加签）
+- ✅ 通知日志记录（避免重复通知）
+- ✅ 手动触发通知脚本
 
 ## 数据模型
 
@@ -177,6 +200,28 @@ DATABASE_URL=sqlite:///./certificates.db
 | manager | String | 关联主管 |
 | type | String | 类型 |
 | remark | Text | 备注 |
+
+### NotificationLog（通知日志表）
+
+| 字段 | 类型 | 描述 |
+|------|------|------|
+| id | Integer | 主键 |
+| certificate_id | Integer | 证书ID（外键） |
+| notification_date | DateTime | 通知时间 |
+| days_remaining | Integer | 剩余天数 |
+| sent_success | Boolean | 是否发送成功 |
+| error_message | String | 错误信息 |
+| notification_type | String | 通知类型 |
+
+## 脚本工具
+
+| 脚本 | 描述 |
+|------|------|
+| `scripts/init_db.py` | 初始化数据库 |
+| `scripts/seed.py` | 生成假数据 |
+| `scripts/test_dingtalk.py` | 测试钉钉机器人 |
+| `scripts/trigger_notification.py` | 手动触发证书检查和通知 |
+| `scripts/clear_notifications.py` | 清空通知日志 |
 
 ## 开发说明
 
